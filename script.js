@@ -228,3 +228,100 @@ if (laporan.menuStokMenipis.length === 0) {
 // Menampilkan seluruh object laporan.
 console.log("\n=== OBJECT LAPORAN LENGKAP ===");
 console.log(laporan);
+
+
+
+/*
+JAWABAN PERTANYAAN LAPORAN HARIAN
+
+1. Kenapa penjualanPerMenu menggunakan object, bukan array?
+   penjualanPerMenu menggunakan object karena setiap nama menu
+   menjadi kunci dan jumlah penjualannya menjadi nilai.
+   Contohnya:
+   {
+       "Kopi Susu": 2,
+       "Nasi Goreng": 3
+   }
+
+   Jika menggunakan array biasa, data nama menu dan jumlahnya
+   perlu diatur dalam bentuk lain agar mudah dicari berdasarkan nama.
+   Bracket notation digunakan untuk mengakses atau mengisi properti
+   menggunakan nama menu yang tersimpan di variabel.
+
+   Contoh:
+   laporan.penjualanPerMenu[item.menu] += item.jumlah;
+
+   Dengan cara ini, nama menu seperti "Kopi Susu" dapat digunakan
+   sebagai kunci object secara langsung.
+
+2. Apa perbedaan Object.keys dan Object.values?
+   Object.keys menghasilkan array berisi nama-nama properti atau
+   kunci dari sebuah object.
+   Object.values menghasilkan array berisi nilai dari properti
+   object tersebut.
+
+   Contoh dari kode:
+   console.log(Object.keys(laporan.penjualanPerMenu));
+   // Contoh hasil: ["Kopi Susu", "Nasi Goreng", "Teh Manis"]
+
+   console.log(Object.values(laporan.penjualanPerMenu));
+   // Contoh hasil: [2, 3, 2]
+
+   Hasil sebenarnya bergantung pada jumlah item yang terjual
+   dalam transaksi berstatus LUNAS.
+
+3. Array method mana yang mengubah array asli?
+   - includes() hanya memeriksa apakah suatu nilai tersedia.
+     Array asli tidak berubah.
+   - indexOf() mencari posisi suatu nilai.
+     Array asli tidak berubah.
+   - slice() mengambil sebagian elemen dan menghasilkan array baru.
+     Array asli tidak berubah.
+   - splice() mengubah array tempat method itu dipanggil.
+
+   Dalam kode, splice dipanggil pada salinan:
+   const salinanKode = laporan.kodeLunas.slice();
+   salinanKode.splice(0, 1);
+
+   Bukti di Console:
+   console.log("Array salinan setelah splice:", salinanKode);
+   console.log("Array kodeLunas asli:", laporan.kodeLunas);
+
+   Array salinan kehilangan kode pertama, sedangkan kodeLunas
+   tetap berisi seluruh kode transaksi lunas. Ini membuktikan
+   bahwa splice mengubah salinan, bukan array aslinya.
+
+4. Kenapa rataRata harus berupa angka setelah memakai toFixed?
+   toFixed() menghasilkan string, bukan number.
+   Jika hasilnya digunakan dalam perhitungan berikutnya, operasi
+   penjumlahan dapat menggabungkan teks, bukan menjumlahkan angka.
+
+   Contoh:
+   const hasil = (150000 / 3).toFixed(2);
+   console.log(typeof hasil); // "string"
+
+   console.log(hasil + 1000); // "50000.001000"
+
+   Agar menjadi angka:
+   const rataRata = Number((150000 / 3).toFixed(2));
+   console.log(typeof rataRata); // "number"
+
+   Pada kode laporan saya, rataRata menggunakan Math.round(),
+   sehingga hasilnya sudah berupa angka dan tidak membutuhkan
+   konversi dari toFixed().
+
+5. Apa hasil pengecekan jumlah kode?
+   Pada data contoh, jumlah transaksi LUNAS adalah 3.
+   Kode lunas yang dikumpulkan menggunakan push adalah:
+   ["trx-001", "trx-002", "trx-005"]
+
+   Ringkasan kode yang dibuat dengan perulangan dan +=:
+   "trx-001, trx-002, trx-005"
+
+   Ketika dipisahkan menggunakan split(", "), hasilnya memiliki
+   3 elemen. Jadi, jumlah kode sama dengan jumlah transaksi LUNAS
+   dan hasil pengecekannya adalah true.
+
+   Pengecekan ini berhasil karena setiap transaksi berstatus LUNAS
+   ditambahkan satu kali ke kodeLunas dan satu kali ke ringkasanKode.
+*/
