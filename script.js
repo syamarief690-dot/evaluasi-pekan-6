@@ -282,3 +282,86 @@ ujiRupiah.forEach(input => {
 // 1250000 → Rp 1.250.000
 // 500 → Rp 500
 // 0 → Rp 0
+
+//jawaban
+
+
+/*
+JAWABAN PERTANYAAN BAGIAN 2.2
+
+1. Perbedaan parseInt, parseFloat, dan Number:
+   - parseInt mengubah teks menjadi bilangan bulat.
+   - parseFloat mengubah teks menjadi bilangan desimal.
+   - Number mengubah seluruh teks menjadi angka jika formatnya valid.
+   - ubahKeAngka harus menghapus titik terlebih dahulu karena titik
+     pada "150.000" dianggap sebagai tanda desimal, bukan pemisah ribuan.
+     Jika tidak dihapus, Number("150.000") menghasilkan 150.
+   - parseInt("150.000") menghasilkan 150, bukan 150000.
+
+2. toFixed mengembalikan teks (string), bukan angka.
+   Contoh pembuktian:
+
+   const hasil = (10.567).toFixed(2);
+   console.log(hasil);        // "10.57"
+   console.log(typeof hasil); // "string"
+
+   Jika hasilnya langsung dijumlahkan dengan angka,
+   JavaScript dapat menggabungkannya sebagai teks.
+
+   const hasilJumlah = (10.567).toFixed(2) + 5;
+   console.log(hasilJumlah); // "10.575"
+
+   Agar dijumlahkan sebagai angka, ubah hasilnya menggunakan Number():
+
+   console.log(Number((10.567).toFixed(2)) + 5); // 15.57
+
+3. Perbedaan replace dan replaceAll:
+   - replace mengganti kecocokan pertama jika menggunakan teks biasa.
+   - replaceAll mengganti semua kecocokan jika menggunakan teks biasa.
+   - Pada ubahKeAngka, kode berikut menggunakan replace dengan regex /g
+     agar semua titik dihapus:
+
+   String(teks).replace(/\./g, "");
+
+   Regex dengan flag g membuat semua titik yang cocok dihapus,
+   sehingga replaceAll tidak diperlukan di bagian tersebut.
+
+4. String bersifat immutable, artinya isi string tidak dapat diubah
+   secara langsung. toUpperCase() menghasilkan string baru.
+   Karena itu, kode berikut tidak mengubah variabel kode:
+
+   kode.toUpperCase();
+
+   Agar hasilnya tersimpan, gunakan:
+
+   kode = kode.toUpperCase();
+
+   Namun, variabel kode harus bisa diubah, misalnya menggunakan let.
+   Jika menggunakan const, hasilnya bisa disimpan ke variabel baru.
+
+5. Contoh tiga bentuk function dari kode:
+
+   a. Function declaration:
+      function bersihkanNama(teks) {
+          // ...
+      }
+
+      Saya memilih bentuk ini karena nama fungsi terlihat jelas
+      dan fungsi dapat dipanggil sebelum deklarasinya di kode.
+
+   b. Function expression:
+      const ubahKeAngka = function (teks) {
+          // ...
+      };
+
+      Saya memilih bentuk ini agar fungsi disimpan dalam konstanta
+      dan variabel fungsi tidak dapat ditugaskan ulang.
+
+   c. Arrow function:
+      const ambilPersenVoucher = (kode) => {
+          // ...
+      };
+
+      Saya memilih bentuk ini karena penulisannya lebih ringkas
+      dan cocok untuk fungsi pengolahan voucher.
+*/
