@@ -129,3 +129,156 @@ const transaksiMentah = [
         pesanan: []
     }
 ];
+
+
+
+
+"use strict";
+
+// 1. Function declaration
+// Membersihkan spasi dan merapikan huruf pada nama pelanggan.
+function bersihkanNama(teks) {
+    return String(teks ?? "")
+        .trim()
+        .replace(/\s+/g, " ")
+        .toLowerCase()
+        .replace(/\b[a-z]/g, huruf => huruf.toUpperCase());
+}
+
+// 2. Function expression
+// Mengubah teks menjadi angka dan mengembalikan 0 jika tidak valid.
+const ubahKeAngka = function (teks) {
+    const angka = Number(
+        String(teks ?? "")
+            .replace(/\./g, "")
+            .replace(/\s/g, "")
+    );
+
+    return Number.isFinite(angka) ? angka : 0;
+};
+
+// 3. Arrow function
+// Mengambil angka persen jika kode voucher diawali kata DISKON.
+const ambilPersenVoucher = (kode) => {
+    const kodeBersih = String(kode ?? "")
+        .trim()
+        .replace(/\s+/g, "")
+        .toUpperCase();
+
+    const hasil = kodeBersih.match(/^DISKON(\d+(?:\.\d+)?)$/);
+
+    return hasil ? Number(hasil[1]) : 0;
+};
+
+// 4. Function declaration
+// Mengubah angka menjadi format rupiah dengan titik pemisah ribuan.
+function formatRupiah(angka) {
+    const nilai = Number(angka);
+
+    if (!Number.isFinite(nilai)) {
+        return "Rp 0";
+    }
+
+    const teksAngka = String(Math.trunc(nilai));
+    const angkaAbsolut = teksAngka.replace(/^-/, "");
+    const angkaBerformat = angkaAbsolut.replace(
+        /\B(?=(\d{3})+(?!\d))/g,
+        "."
+    );
+
+    return nilai < 0
+        ? `Rp -${angkaBerformat}`
+        : `Rp ${angkaBerformat}`;
+}
+
+// ========================================
+// PENGUJIAN FUNCTION PEMBERSIH DATA
+// ========================================
+
+// Pengujian bersihkanNama()
+console.log("=== UJI BERSIHKAN NAMA ===");
+
+const ujiNama = [
+    "  rina   WULANDARI ",
+    "",
+    "  bUDI santoso  "
+];
+
+ujiNama.forEach(input => {
+    console.log(
+        JSON.stringify(input),
+        "→",
+        JSON.stringify(bersihkanNama(input))
+    );
+});
+
+// Pengujian ubahKeAngka()
+console.log("\n=== UJI UBAH KE ANGKA ===");
+
+const ujiAngka = [
+    "150.000",
+    "75000",
+    "abc"
+];
+
+ujiAngka.forEach(input => {
+    console.log(
+        JSON.stringify(input),
+        "→",
+        ubahKeAngka(input)
+    );
+});
+
+// Pengujian ambilPersenVoucher()
+console.log("\n=== UJI AMBIL PERSEN VOUCHER ===");
+
+const ujiVoucher = [
+    " diskon10 ",
+    "PROMO5",
+    ""
+];
+
+ujiVoucher.forEach(input => {
+    console.log(
+        JSON.stringify(input),
+        "→",
+        ambilPersenVoucher(input)
+    );
+});
+
+// Pengujian formatRupiah()
+console.log("\n=== UJI FORMAT RUPIAH ===");
+
+const ujiRupiah = [
+    1250000,
+    500,
+    0
+];
+
+ujiRupiah.forEach(input => {
+    console.log(
+        input,
+        "→",
+        formatRupiah(input)
+    );
+});
+
+// === UJI BERSIHKAN NAMA ===
+// "  rina   WULANDARI " → "Rina Wulandari"
+// "" → ""
+// "  bUDI santoso  " → "Budi Santoso"
+
+// === UJI UBAH KE ANGKA ===
+// "150.000" → 150000
+// "75000" → 75000
+// "abc" → 0
+
+// === UJI AMBIL PERSEN VOUCHER ===
+// " diskon10 " → 10
+// "PROMO5" → 0
+// "" → 0
+
+// === UJI FORMAT RUPIAH ===
+// 1250000 → Rp 1.250.000
+// 500 → Rp 500
+// 0 → Rp 0
