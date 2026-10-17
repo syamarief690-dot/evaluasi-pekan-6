@@ -1,367 +1,285 @@
 
-const kedai = {
-    nama: "Kedai AMS",
-    pemilik: "Arief Syam",
-    kota: "Yogyakarta",
-    tahunBerdiri: 2022,
-    sedangBuka: true,
-    nomorWhatsApp: "081234567890",
-    website: null,
-    jamOperasional: {
-        buka: "08:00",
-        tutup: "22:00"
-    }
-};
-
-const menu = [
-    {
-        nama: "Kopi Susu",
-        kategori: "Minuman",
-        harga: 15000,
-        stok: 20
-    },
-    {
-        nama: "Kopi Hitam",
-        kategori: "Minuman",
-        harga: 10000,
-        stok: 15
-    },
-    {
-        nama: "Teh Manis",
-        kategori: "Minuman",
-        harga: 5000,
-        stok: 25
-    },
-    {
-        nama: "Nasi Goreng",
-        kategori: "Makanan",
-        harga: 20000,
-        stok: 10
-    },
-    {
-        nama: "Mie Goreng",
-        kategori: "Makanan",
-        harga: 18000,
-        stok: 8
-    },
-    {
-        nama: "Roti Bakar",
-        kategori: "Camilan",
-        harga: 12000,
-        stok: 12
-    },
-    {
-        nama: "Kentang Goreng",
-        kategori: "Camilan",
-        harga: 10000,
-        stok: 0
-    },
-    {
-        nama: "Jus Alpukat",
-        kategori: "Minuman",
-        harga: 14000,
-        stok: 7
-    }
-];
-
-const transaksiMentah = [
-    {
-        kode: "trx-001",
-        pelanggan: " rina WULANDARI ",
-        hari: " jumat ",
-        uangBayar: "150.000",
-        voucher: " diskon10 ",
-        pesanan: [
-            { menu: " kopi SUSU", jumlah: "2" },
-            { menu: "NASI GORENG ", jumlah: "3" }
-        ]
-    },
-    {
-        kode: "trx-002",
-        pelanggan: "budi santoso",
-        hari: "sabtu",
-        uangBayar: "75000",
-        voucher: " ",
-        pesanan: [
-            { menu: "teh MANIS ", jumlah: "2" },
-            { menu: " Roti Bakar", jumlah: "2" }
-        ]
-    },
-    {
-        kode: "trx-003",
-        pelanggan: " SITI AMINAH ",
-        hari: "senin",
-        uangBayar: "10000",
-        voucher: "diskon10",
-        pesanan: [
-            { menu: "Nasi Goreng", jumlah: "1" }
-        ]
-    },
-    {
-        kode: "trx-004",
-        pelanggan: "   ",
-        hari: "minggu",
-        uangBayar: "50000",
-        voucher: "",
-        pesanan: [
-            { menu: "Kopi Hitam", jumlah: "2" }
-        ]
-    },
-    {
-        kode: "trx-005",
-        pelanggan: "andi pratama",
-        hari: "rabu",
-        uangBayar: "100000",
-        voucher: "HEMAT5",
-        pesanan: [
-            { menu: "Kopi Susu", jumlah: "1" },
-            { menu: "Menu Tidak Ada", jumlah: "2" },
-            { menu: "Kentang Goreng", jumlah: "1" },
-            { menu: "Teh Manis", jumlah: "0" }
-        ]
-    },
-    {
-        kode: "trx-006",
-        pelanggan: "dewi lestari",
-        hari: "kamis",
-        uangBayar: "90000",
-        voucher: "",
-        pesanan: []
-    }
-];
-
-
-
-
 "use strict";
 
-// 1. Function declaration
-// Membersihkan spasi dan merapikan huruf pada nama pelanggan.
-function bersihkanNama(teks) {
-    return String(teks ?? "")
-        .trim()
-        .replace(/\s+/g, " ")
-        .toLowerCase()
-        .replace(/\b[a-z]/g, huruf => huruf.toUpperCase());
-}
+// ==========================================
+// BAGIAN 3: PEMBERSIHAN TRANSAKSI MENTAH
+// ==========================================
+// Jika transaksiBersih sudah dibuat pada bagian sebelumnya,
+// jangan deklarasikan ulang. Gunakan data yang sudah tersedia.
 
-// 2. Function expression
-// Mengubah teks menjadi angka dan mengembalikan 0 jika tidak valid.
-const ubahKeAngka = function (teks) {
-    const angka = Number(
-        String(teks ?? "")
-            .replace(/\./g, "")
-            .replace(/\s/g, "")
-    );
+const transaksiBersih = transaksiMentah.map((trx) => ({
+    kode: String(trx.kode ?? "").trim().toLowerCase(),
+    pelanggan: bersihkanNama(trx.pelanggan),
+    hari: String(trx.hari ?? "").trim().toLowerCase(),
+    uangBayar: ubahKeAngka(trx.uangBayar),
+    voucher: String(trx.voucher ?? "").trim(),
+    pesanan: Array.isArray(trx.pesanan)
+        ? trx.pesanan.map((item) => ({
+            menu: bersihkanNama(item.menu),
+            jumlah: ubahKeAngka(item.jumlah)
+        }))
+        : []
+}));
 
-    return Number.isFinite(angka) ? angka : 0;
-};
+// ==========================================
+// OBJECT KASIR
+// ==========================================
 
-// 3. Arrow function
-// Mengambil angka persen jika kode voucher diawali kata DISKON.
-const ambilPersenVoucher = (kode) => {
-    const kodeBersih = String(kode ?? "")
-        .trim()
-        .replace(/\s+/g, "")
-        .toUpperCase();
+const kasir = {
+    menu: menu,
+    saldoKas: 0,
+    riwayat: [],
+    pecahan: [50000, 20000, 10000, 5000, 2000, 1000],
 
-    const hasil = kodeBersih.match(/^DISKON(\d+(?:\.\d+)?)$/);
+    // Mencari menu menggunakan for...of.
+    cariMenu(nama) {
+        for (const item of this.menu) {
+            if (
+                bersihkanNama(item.nama).toLowerCase() ===
+                bersihkanNama(nama).toLowerCase()
+            ) {
+                return item;
+            }
+        }
 
-    return hasil ? Number(hasil[1]) : 0;
-};
+        return null;
+    },
 
-// 4. Function declaration
-// Mengubah angka menjadi format rupiah dengan titik pemisah ribuan.
-function formatRupiah(angka) {
-    const nilai = Number(angka);
+    // Menghitung subtotal dan memisahkan item valid
+    // dari item yang tidak valid.
+    hitungSubtotal(pesanan) {
+        let subtotal = 0;
+        const itemValid = [];
+        const itemTidakValid = [];
 
-    if (!Number.isFinite(nilai)) {
-        return "Rp 0";
-    }
+        for (const item of pesanan) {
+            const namaMenu = bersihkanNama(item.menu);
+            const jumlah = ubahKeAngka(item.jumlah);
+            const dataMenu = this.cariMenu(namaMenu);
 
-    const teksAngka = String(Math.trunc(nilai));
-    const angkaAbsolut = teksAngka.replace(/^-/, "");
-    const angkaBerformat = angkaAbsolut.replace(
-        /\B(?=(\d{3})+(?!\d))/g,
-        "."
-    );
+            if (!dataMenu) {
+                itemTidakValid.push({
+                    menu: namaMenu,
+                    alasan: "Menu tidak ditemukan"
+                });
+                continue;
+            }
 
-    return nilai < 0
-        ? `Rp -${angkaBerformat}`
-        : `Rp ${angkaBerformat}`;
-}
+            if (jumlah <= 0) {
+                itemTidakValid.push({
+                    menu: namaMenu,
+                    alasan: "Jumlah harus lebih dari 0"
+                });
+                continue;
+            }
 
-// ========================================
-// PENGUJIAN FUNCTION PEMBERSIH DATA
-// ========================================
+            if (dataMenu.stok < jumlah) {
+                itemTidakValid.push({
+                    menu: namaMenu,
+                    alasan: "Stok tidak cukup"
+                });
+                continue;
+            }
 
-// Pengujian bersihkanNama()
-console.log("=== UJI BERSIHKAN NAMA ===");
+            itemValid.push({
+                menu: dataMenu.nama,
+                jumlah: jumlah,
+                harga: dataMenu.harga
+            });
 
-const ujiNama = [
-    "  rina   WULANDARI ",
-    "",
-    "  bUDI santoso  "
-];
+            subtotal += dataMenu.harga * jumlah;
+        }
 
-ujiNama.forEach(input => {
-    console.log(
-        JSON.stringify(input),
-        "→",
-        JSON.stringify(bersihkanNama(input))
-    );
-});
+        return {
+            subtotal,
+            itemValid,
+            itemTidakValid
+        };
+    },
 
-// Pengujian ubahKeAngka()
-console.log("\n=== UJI UBAH KE ANGKA ===");
+    // Menghitung promo berdasarkan hari menggunakan switch.
+    hitungPromoHari(hari) {
+        switch (String(hari ?? "").trim().toLowerCase()) {
+            case "jumat":
+                return 3000;
 
-const ujiAngka = [
-    "150.000",
-    "75000",
-    "abc"
-];
+            case "sabtu":
+            case "minggu":
+                return 5000;
 
-ujiAngka.forEach(input => {
-    console.log(
-        JSON.stringify(input),
-        "→",
-        ubahKeAngka(input)
-    );
-});
+            default:
+                return 0;
+        }
+    },
 
-// Pengujian ambilPersenVoucher()
-console.log("\n=== UJI AMBIL PERSEN VOUCHER ===");
+    // Mengambil persentase terbesar antara diskon subtotal
+    // dan voucher, kemudian menghitung nominal diskon.
+    hitungDiskon(subtotal, persenVoucher) {
+        let persenSubtotal;
 
-const ujiVoucher = [
-    " diskon10 ",
-    "PROMO5",
-    ""
-];
+        if (subtotal >= 100000) {
+            persenSubtotal = 15;
+        } else if (subtotal >= 50000) {
+            persenSubtotal = 10;
+        } else if (subtotal >= 25000) {
+            persenSubtotal = 5;
+        } else {
+            persenSubtotal = 0;
+        }
 
-ujiVoucher.forEach(input => {
-    console.log(
-        JSON.stringify(input),
-        "→",
-        ambilPersenVoucher(input)
-    );
-});
+        const persenDipakai = Math.max(
+            persenSubtotal,
+            ubahKeAngka(persenVoucher)
+        );
 
-// Pengujian formatRupiah()
-console.log("\n=== UJI FORMAT RUPIAH ===");
+        return Math.round(subtotal * persenDipakai / 100);
+    },
 
-const ujiRupiah = [
-    1250000,
-    500,
-    0
-];
+    // Menghitung pajak dan mengembalikan angka.
+    hitungPajak(nilai, tarif = 0.11) {
+        return Math.round(nilai * tarif);
+    },
 
-ujiRupiah.forEach(input => {
-    console.log(
-        input,
-        "→",
-        formatRupiah(input)
-    );
-});
+    // Menguraikan kembalian berdasarkan pecahan uang.
+    hitungKembalianPecahan(kembalian) {
+        if (kembalian < 0) {
+            return null;
+        }
 
-// === UJI BERSIHKAN NAMA ===
-// "  rina   WULANDARI " → "Rina Wulandari"
-// "" → ""
-// "  bUDI santoso  " → "Budi Santoso"
+        let sisa = Math.trunc(kembalian);
+        const hasil = {};
 
-// === UJI UBAH KE ANGKA ===
-// "150.000" → 150000
-// "75000" → 75000
-// "abc" → 0
+        for (const pecahan of this.pecahan) {
+            let jumlahLembar = 0;
 
-// === UJI AMBIL PERSEN VOUCHER ===
-// " diskon10 " → 10
-// "PROMO5" → 0
-// "" → 0
+            while (sisa >= pecahan) {
+                sisa -= pecahan;
+                jumlahLembar++;
+            }
 
-// === UJI FORMAT RUPIAH ===
-// 1250000 → Rp 1.250.000
-// 500 → Rp 500
-// 0 → Rp 0
+            if (jumlahLembar > 0) {
+                hasil[pecahan] = jumlahLembar;
+            }
+        }
 
-//jawaban
+        hasil.sisa = sisa;
 
+        return hasil;
+    },
 
-/*
-JAWABAN PERTANYAAN BAGIAN 2.2
+    // Memproses satu transaksi.
+    prosesTransaksi(trx) {
+        const kode = trx.kode;
+        const pelanggan = bersihkanNama(trx.pelanggan);
+        const pesanan = Array.isArray(trx.pesanan)
+            ? trx.pesanan
+            : [];
 
-1. Perbedaan parseInt, parseFloat, dan Number:
-   - parseInt mengubah teks menjadi bilangan bulat.
-   - parseFloat mengubah teks menjadi bilangan desimal.
-   - Number mengubah seluruh teks menjadi angka jika formatnya valid.
-   - ubahKeAngka harus menghapus titik terlebih dahulu karena titik
-     pada "150.000" dianggap sebagai tanda desimal, bukan pemisah ribuan.
-     Jika tidak dihapus, Number("150.000") menghasilkan 150.
-   - parseInt("150.000") menghasilkan 150, bukan 150000.
+        // Validasi nama pelanggan.
+        if (!pelanggan) {
+            const hasil = {
+                kode,
+                pelanggan,
+                status: "DITOLAK",
+                alasan: "Nama pelanggan kosong"
+            };
 
-2. toFixed mengembalikan teks (string), bukan angka.
-   Contoh pembuktian:
+            this.riwayat.push(hasil);
+            return hasil;
+        }
 
-   const hasil = (10.567).toFixed(2);
-   console.log(hasil);        // "10.57"
-   console.log(typeof hasil); // "string"
+        // Validasi panjang array pesanan.
+        if (pesanan.length === 0) {
+            const hasil = {
+                kode,
+                pelanggan,
+                status: "DITOLAK",
+                alasan: "Pesanan kosong"
+            };
 
-   Jika hasilnya langsung dijumlahkan dengan angka,
-   JavaScript dapat menggabungkannya sebagai teks.
+            this.riwayat.push(hasil);
+            return hasil;
+        }
 
-   const hasilJumlah = (10.567).toFixed(2) + 5;
-   console.log(hasilJumlah); // "10.575"
+        const ringkasan = this.hitungSubtotal(pesanan);
 
-   Agar dijumlahkan sebagai angka, ubah hasilnya menggunakan Number():
+        // Transaksi ditolak jika tidak ada item yang valid.
+        if (ringkasan.itemValid.length === 0) {
+            const hasil = {
+                kode,
+                pelanggan,
+                status: "DITOLAK",
+                alasan: "Tidak ada item valid"
+            };
 
-   console.log(Number((10.567).toFixed(2)) + 5); // 15.57
+            this.riwayat.push(hasil);
+            return hasil;
+        }
 
-3. Perbedaan replace dan replaceAll:
-   - replace mengganti kecocokan pertama jika menggunakan teks biasa.
-   - replaceAll mengganti semua kecocokan jika menggunakan teks biasa.
-   - Pada ubahKeAngka, kode berikut menggunakan replace dengan regex /g
-     agar semua titik dihapus:
+        const subtotal = ringkasan.subtotal;
+        const promoHari = this.hitungPromoHari(trx.hari);
+        const persenVoucher = ambilPersenVoucher(trx.voucher);
 
-   String(teks).replace(/\./g, "");
+        const diskon = this.hitungDiskon(
+            subtotal,
+            persenVoucher
+        );
 
-   Regex dengan flag g membuat semua titik yang cocok dihapus,
-   sehingga replaceAll tidak diperlukan di bagian tersebut.
+        // Nilai setelah diskon tidak boleh negatif.
+        const nilaiSetelahDiskon = Math.max(
+            0,
+            subtotal - diskon - promoHari
+        );
 
-4. String bersifat immutable, artinya isi string tidak dapat diubah
-   secara langsung. toUpperCase() menghasilkan string baru.
-   Karena itu, kode berikut tidak mengubah variabel kode:
+        const pajak = this.hitungPajak(nilaiSetelahDiskon);
+        const total = nilaiSetelahDiskon + pajak;
+        const uangBayar = ubahKeAngka(trx.uangBayar);
+        const kembalian = uangBayar - total;
 
-   kode.toUpperCase();
+        const status = uangBayar >= total
+            ? "LUNAS"
+            : "KURANG";
 
-   Agar hasilnya tersimpan, gunakan:
+        let pecahanKembalian = null;
 
-   kode = kode.toUpperCase();
+        // Stok dan saldo hanya berubah jika transaksi lunas.
+        if (status === "LUNAS") {
+            for (const item of ringkasan.itemValid) {
+                const dataMenu = this.cariMenu(item.menu);
 
-   Namun, variabel kode harus bisa diubah, misalnya menggunakan let.
-   Jika menggunakan const, hasilnya bisa disimpan ke variabel baru.
+                if (dataMenu) {
+                    dataMenu.stok -= item.jumlah;
+                }
+            }
 
-5. Contoh tiga bentuk function dari kode:
+            this.saldoKas += total;
 
-   a. Function declaration:
-      function bersihkanNama(teks) {
-          // ...
-      }
+            pecahanKembalian =
+                this.hitungKembalianPecahan(kembalian);
+        }
 
-      Saya memilih bentuk ini karena nama fungsi terlihat jelas
-      dan fungsi dapat dipanggil sebelum deklarasinya di kode.
+        const hasil = {
+            kode,
+            pelanggan,
+            status,
+            subtotal,
+            promoHari,
+            diskon,
+            pajak,
+            total,
+            uangBayar,
+            kembalian,
+            pecahanKembalian,
+            itemValid: ringkasan.itemValid,
+            itemTidakValid: ringkasan.itemTidakValid
+        };
 
-   b. Function expression:
-      const ubahKeAngka = function (teks) {
-          // ...
-      };
+        this.riwayat.push(hasil);
 
-      Saya memilih bentuk ini agar fungsi disimpan dalam konstanta
-      dan variabel fungsi tidak dapat ditugaskan ulang.
+        return hasil;
+    },
 
-   c. Arrow function:
-      const ambilPersenVoucher = (kode) => {
-          // ...
-      };
-
-      Saya memilih bentuk ini karena penulisannya lebih ringkas
-      dan cocok untuk fungsi pengolahan voucher.
-*/
+    // Mencetak struk transaksi dengan template literal.
+    cetakStruk(hasil) {
+        if (hasil.status === "DITOLAK") {
+            console.log(`
