@@ -274,3 +274,69 @@ for (const nilai of nilaiTruthy) {
   }
 }
 // Semua nilai di atas masuk ke blok if.
+
+/*
+JAWABAN 7.3
+
+1. Pada Potongan A, kenapa "10" + 5 * 2 menghasilkan "1010"?
+
+   JavaScript mengerjakan perkalian terlebih dahulu karena
+   operator * memiliki prioritas lebih tinggi daripada +.
+   Jadi, 5 * 2 menghasilkan angka 10.
+   Setelah itu, "10" + 10 menggabungkan string "10" dengan
+   angka 10 menjadi string "1010".
+
+2. Pada Potongan B, kenapa potongan dan hapus memiliki isi
+   yang sama, tetapi efeknya pada angka berbeda?
+
+   slice(1, 3) mengambil elemen indeks 1 sampai sebelum indeks 3
+   dan menghasilkan array baru tanpa mengubah array asli.
+   splice(1, 2) mengambil dua elemen mulai indeks 1 sekaligus
+   menghapusnya dari array asli.
+   Karena itu, potongan dan hapus sama-sama berisi [20, 30],
+   tetapi angka tetap [10, 20, 30, 40] setelah slice dan menjadi
+   [10, 40] setelah splice.
+
+3. Pada Potongan B, kenapa console.log(cetak(4)) mencetak
+   dua baris? Dari mana undefined berasal?
+
+   Function cetak(4) menjalankan console.log(n * 2), sehingga
+   angka 8 dicetak terlebih dahulu.
+   Function cetak tidak memiliki return, jadi hasil pemanggilan
+   function adalah undefined.
+   Kemudian console.log di bagian luar mencetak undefined.
+   Jadi, dua baris yang terlihat adalah 8 dan undefined.
+
+4. Pada Potongan C, kenapa hasil bernilai "134"?
+
+   Putaran i = 1:
+   Tidak ada continue atau break. Angka 1 ditambahkan ke hasil,
+   sehingga hasil menjadi "1".
+
+   Putaran i = 2:
+   Kondisi i === 2 benar. continue melewati penambahan angka 2.
+   Hasil tetap "1".
+
+   Putaran i = 3:
+   Tidak ada continue atau break. Angka 3 ditambahkan,
+   sehingga hasil menjadi "13".
+
+   Putaran i = 4:
+   Angka 4 ditambahkan, sehingga hasil menjadi "134".
+
+   Putaran i = 5:
+   Kondisi i === 5 benar. break menghentikan perulangan.
+   Angka 5 tidak ditambahkan dan putaran i = 6 tidak dijalankan.
+   Jadi, nilai akhir hasil adalah string "134".
+
+5. Pada Potongan C, kenapa do...while menjalankan blok
+   satu kali meskipun kondisi x < 3 bernilai false?
+
+   do...while menjalankan blok terlebih dahulu, kemudian
+   memeriksa kondisi.
+   Awalnya x = 0. Blok dijalankan dan x ditambah 5,
+   sehingga x menjadi 5.
+   Setelah itu, kondisi x < 3 diperiksa dan hasilnya false.
+   Perulangan berhenti, tetapi satu kali eksekusi sudah terjadi.
+   Karena itu, nilai akhir x adalah 5.
+*/
