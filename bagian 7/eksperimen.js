@@ -165,3 +165,112 @@ for (let huruf of "ABC") {
 // Aa
 // Bb
 // Cc
+
+// ========================================
+// 1. Function declaration vs function expression
+// ========================================
+
+// Function declaration bisa dipanggil sebelum didefinisikan.
+console.log("Declaration:", sapa()); // Hasil: Halo!
+
+function sapa() {
+  return "Halo!";
+}
+
+// Function expression menggunakan const tidak bisa dipanggil
+// sebelum baris deklarasinya dijalankan.
+// Jika diaktifkan sebelum deklarasi, akan muncul ReferenceError:
+// Cannot access 'salam' before initialization
+
+// console.log(salam());
+
+// FIX: Deklarasikan function expression terlebih dahulu.
+const salam = function () {
+  return "Selamat pagi!";
+};
+
+console.log("Expression:", salam()); // Hasil: Selamat pagi!
+
+
+// ========================================
+// 2. slice tidak mengubah array, splice mengubah array
+// ========================================
+
+const angkaSlice = [10, 20, 30, 40];
+const hasilSlice = angkaSlice.slice(1, 3);
+
+console.log("Hasil slice:", hasilSlice); // [20, 30]
+console.log("Asli setelah slice:", angkaSlice); // [10, 20, 30, 40]
+
+const angkaSplice = [10, 20, 30, 40];
+const hasilSplice = angkaSplice.splice(1, 2);
+
+console.log("Hasil splice:", hasilSplice); // [20, 30]
+console.log("Asli setelah splice:", angkaSplice); // [10, 40]
+
+
+// ========================================
+// 3. for...in menghasilkan indeks,
+//    for...of menghasilkan nilai
+// ========================================
+
+const buah = ["apel", "jeruk", "mangga"];
+
+console.log("Dengan for...in:");
+for (const indeks in buah) {
+  console.log(indeks, typeof indeks);
+}
+// Hasil:
+// 0 string
+// 1 string
+// 2 string
+
+console.log("Dengan for...of:");
+for (const nilai of buah) {
+  console.log(nilai, typeof nilai);
+}
+// Hasil:
+// apel string
+// jeruk string
+// mangga string
+
+
+// ========================================
+// 4. toFixed menghasilkan string
+// ========================================
+
+const angkaDesimal = (5).toFixed(1);
+
+console.log("Hasil toFixed:", angkaDesimal); // "5.0"
+console.log("Tipe data:", typeof angkaDesimal); // string
+console.log("(5).toFixed(1) + 1:", (5).toFixed(1) + 1); // "5.01"
+console.log("Jika diubah ke Number:", Number(angkaDesimal) + 1); // 6
+
+
+// ========================================
+// 5. Membuktikan nilai Falsy dan Truthy
+// ========================================
+
+const nilaiFalsy = [false, 0, "", null, undefined, NaN];
+
+console.log("Pengujian nilai Falsy:");
+for (const nilai of nilaiFalsy) {
+  if (nilai) {
+    console.log("Masuk if:", nilai);
+  } else {
+    console.log("Tidak masuk if:", String(nilai));
+  }
+}
+// Semua nilai di atas tidak masuk ke blok if.
+
+console.log("Pengujian nilai Truthy:");
+const nilaiTruthy = ["0", [], {}];
+
+for (const nilai of nilaiTruthy) {
+  if (nilai) {
+    console.log("Masuk if:", nilai);
+  } else {
+    console.log("Tidak masuk if:", nilai);
+  }
+}
+// Semua nilai di atas masuk ke blok if.
