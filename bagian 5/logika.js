@@ -147,3 +147,46 @@ console.log("17 =", cekBilanganPrima(17)); // true
 console.log("15 =", cekBilanganPrima(15)); // false
 console.log("1 =", cekBilanganPrima(1));   // false
 console.log("0 =", cekBilanganPrima(0));   // false
+
+/*
+JAWABAN PERTANYAAN
+
+1. Contoh langkah demi langkah function hitungFaktorial(5):
+   - Awalnya, hasil = 1.
+   - Putaran ke-1: hasil = 1 * 1 = 1.
+   - Putaran ke-2: hasil = 1 * 2 = 2.
+   - Putaran ke-3: hasil = 2 * 3 = 6.
+   - Putaran ke-4: hasil = 6 * 4 = 24.
+   - Putaran ke-5: hasil = 24 * 5 = 120.
+   - Perulangan selesai dan function mengembalikan 120.
+
+2. Array asli pada hapusDuplikat tidak berubah karena function
+   membuat array baru bernama hasil dan tidak mengubah daftar.
+   Saya memakai includes() untuk memeriksa apakah elemen sudah
+   ada di array hasil. Jika belum ada, elemen ditambahkan dengan
+   push(). Cara ini sederhana dan mempertahankan urutan kemunculan
+   pertama setiap elemen.
+
+3. Pada cekBilanganPrima, saya tidak memakai break.
+   Jika menggunakan break saat menemukan pembagi, perulangan
+   bisa langsung dihentikan. Jika break dihapus, hasil tetap benar
+   karena return false sudah menghentikan function ketika pembagi
+   ditemukan. Jadi, dalam kode ini break tidak diperlukan.
+   Jika return false diganti dengan break saja, hasil bisa salah
+   karena function dapat melanjutkan sampai return true.
+
+4. cariTerbesar([]) mengembalikan null karena array kosong tidak
+   memiliki angka terbesar maupun indeks yang bisa dikembalikan.
+   Angka 0 bisa dianggap sebagai angka terbesar yang valid,
+   padahal tidak ada elemen di dalam array. Null menunjukkan
+   bahwa tidak ada hasil yang tersedia.
+
+5. Dua contoh jenis perulangan yang berbeda:
+   - hitungFaktorial menggunakan for karena jumlah putaran sudah
+     diketahui, yaitu dari 1 sampai n.
+   - hitungVokal menggunakan for...of karena function perlu
+     memeriksa setiap huruf dalam teks secara berurutan.
+   - cekPalindrom menggunakan while karena perbandingan dilakukan
+     dari dua ujung teks dan berhenti ketika kedua posisi bertemu
+     atau ditemukan huruf yang berbeda.
+*/
